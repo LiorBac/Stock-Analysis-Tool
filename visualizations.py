@@ -3,11 +3,15 @@ import plotly.graph_objects as go
 def create_stock_chart(hist, company_name, ticker, chart_type):
     """Create a Plotly chart for stock data based on the specified chart type."""
     if chart_type == "Candlestick":
-        return create_stock_candlestick_chart(hist, company_name, ticker) # Candlestick chart
+        fig = create_stock_candlestick_chart(hist) # Candlestick chart
     else:
-        return create_stock_scatter_chart(hist, company_name, ticker) # Line chart
+        fig = create_stock_scatter_chart(hist) # Line chart
+    
+    
+    fig = _apply_chart_layout(fig, hist, company_name, ticker) # Apply common layout
+    return fig
 
-def create_stock_scatter_chart(hist, company_name, ticker): 
+def create_stock_scatter_chart(hist): 
     """Create a Plotly scatter chart for stock closing prices."""
     start_price = hist['Close'].iloc[0]
     end_price = hist['Close'].iloc[-1]
@@ -22,26 +26,31 @@ def create_stock_scatter_chart(hist, company_name, ticker):
                                      mode='lines', name='Close Price',
                                      line=dict(color=line_color, width=2),
                                      fill='tozeroy', fillcolor=fill_color)])
-
-    fig.update_layout(title=f"{company_name} ({ticker}) Price Chart",
-                      yaxis_title="Price (USD)",
-                      xaxis_title="Date",
-                      xaxis_rangeslider_visible=False,
-                      height=600,
-                      template="plotly_dark")
     return fig
 
-def create_stock_candlestick_chart(hist, company_name, ticker):
+def create_stock_candlestick_chart(hist):
     """Create a Plotly candlestick chart for stock prices."""
     fig = go.Figure(data=[go.Candlestick(x=hist.index,
                                          open=hist['Open'], high=hist['High'],
                                          low=hist['Low'], close=hist['Close'],
                                          name='Price')])
+    return fig
 
+def _apply_chart_layout(fig, hist, company_name, ticker):
+    """Apply common layout settings to the chart."""
+    # Set y-axis limits with padding
+    y_min = hist['Low'].min()
+    y_max = hist['High'].max()
+    padding = (y_max - y_min) * 0.05
+    ylim_low = y_min - padding
+    ylim_high = y_max + padding
+
+    # Update layout
     fig.update_layout(title=f"{company_name} ({ticker}) Price Chart",
                       yaxis_title="Price (USD)",
                       xaxis_title="Date",
                       xaxis_rangeslider_visible=False,
                       height=600,
-                      template="plotly_dark")
+                      template="plotly_dark",
+                    yaxis=dict(range=[ylim_low, ylim_high]))
     return fig
