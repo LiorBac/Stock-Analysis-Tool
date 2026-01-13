@@ -6,7 +6,7 @@ def get_stock_data(ticker, period='1mo', interval='1d'):
     # Returns a tuple of (historical_data, stock_info)
 
     stock = yf.Ticker(ticker) # Create a Ticker object
-    hist = stock.history(period=period, interval=interval) # Get historical market data
+    hist = stock.history(period=period, interval=interval, auto_adjust=True) # Get historical data
     
     try:
         info = stock.info # Get stock information
