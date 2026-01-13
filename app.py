@@ -44,3 +44,5 @@ if ticker:
 
         with st.expander("Show Raw Data"): # Expander for raw data
             st.dataframe(hist.sort_index(ascending=False)) # Display raw historical data
+            csv_data = hist.to_csv().encode('utf-8') # Convert data to CSV
+            st.download_button(label="Download Data as CSV", data=csv_data, file_name=f"{ticker}_data.csv", mime='text/csv') # Download button for CSV data
