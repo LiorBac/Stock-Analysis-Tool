@@ -35,7 +35,16 @@ if ticker:
             fig = go.Figure(data=[go.Candlestick(x=hist.index,
                                                  open=hist['Open'],high=hist['High'],low=hist['Low'],close=hist['Close'],name='Price')])
         else:
-            fig = go.Figure(data=[go.Scatter(x=hist.index, y=hist['Close'], mode='lines',name='Close Price')])
+            start_price = hist['Close'].iloc[0]
+            end_price = hist['Close'].iloc[-1]
+            if end_price > start_price:
+                line_color = 'green'
+                fill_color = 'rgba(0, 200, 5, 0.2)'
+            else:
+                line_color = 'red'
+                fill_color = 'rgba(255, 51, 51, 0.2)' 
+
+            fig = go.Figure(data=[go.Scatter(x=hist.index, y=hist['Close'], mode='lines',name='Close Price', line=dict(color=line_color,width=2), fill='tozeroy', fillcolor=fill_color)])
         
         fig.update_layout(title=f"{company_name} ({ticker}) Price Chart",
                           yaxis_title="Price (USD)",
@@ -44,6 +53,6 @@ if ticker:
         
         fig.update_layout(height=600,template="plotly_dark")
         st.plotly_chart(fig, use_container_width=True)
-        
+
         with st.expander("Show Raw Data"):
             st.dataframe(hist.sort_index(ascending=False))
