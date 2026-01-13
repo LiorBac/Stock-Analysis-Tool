@@ -12,6 +12,7 @@ with st.sidebar:
     st.info("Enter a valid stock ticker symbol (e.g., AAPL, MSFT, GOOGL).")
     period = st.selectbox("Select Data Period", options=['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'], index=2) # Select data period
     interval = st.selectbox("Select Data Interval", options=['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo'], index=8) # Select data interval
+    chat_type = st.selectbox("Select Chart Type", options=['Candlestick', 'Line'], index=0) # Select chart type
 
 if ticker:
     hist, info = get_stock_data(ticker, period, interval) # Fetch stock data
@@ -29,14 +30,20 @@ if ticker:
 
         st.markdown("---")
 
-        st.subheader("Price Chart")
-        fig = go.Figure(data=[go.Candlestick(x=hist.index,
-                                             open=hist['Open'],high=hist['High'],low=hist['Low'],close=hist['Close'])])
+        st.subheader(f"Price Chart - {chat_type}")
+        if chat_type == "Candlestick":
+            fig = go.Figure(data=[go.Candlestick(x=hist.index,
+                                                 open=hist['Open'],high=hist['High'],low=hist['Low'],close=hist['Close'],name='Price')])
+        else:
+            fig = go.Figure(data=[go.Scatter(x=hist.index, y=hist['Close'], mode='lines',name='Close Price')])
+        
         fig.update_layout(title=f"{company_name} ({ticker}) Price Chart",
                           yaxis_title="Price (USD)",
                           xaxis_title="Date",
                           xaxis_rangeslider_visible=False)
+        
         fig.update_layout(height=600,template="plotly_dark")
         st.plotly_chart(fig, use_container_width=True)
+        
         with st.expander("Show Raw Data"):
             st.dataframe(hist.sort_index(ascending=False))
