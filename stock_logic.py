@@ -1,6 +1,8 @@
 import yfinance as yf
+import streamlit as st
 import pandas as pd
 
+@st.cache_data(ttl=24*3600)
 def get_stock_data(ticker, period='1mo', interval='1d'):
     # Fetch historical market data and stock info for a given ticker
     # Returns a tuple of (historical_data, stock_info)
