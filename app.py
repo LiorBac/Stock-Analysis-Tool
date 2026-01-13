@@ -24,15 +24,15 @@ if ticker:
         st.header(f"{company_name} ({ticker}) Stock Data") # Display company name and ticker
 
         if len(hist) >= 2: # Ensure there are at least 2 data points to calculate delta
-            delta_val = hist['Close'][-1] - hist['Close'][-2] # Calculate price change
+            delta_val = hist['Close'].iloc[-1] - hist['Close'].iloc[-2] # Calculate price change
             delta_str = f"{delta_val:.2f} since last close" # Format delta string
         else:
             delta_str = "N/A" # Not enough data to calculate delta
 
         col1,col2,col3 = st.columns(3) # Create three columns for metrics
-        col1.metric("Current Price", f"${hist['Close'][-1]:.2f}", delta_str) # Display current price with delta
-        col2.metric("Highest today", f"${hist['High'][-1]:.2f}") # Display highest price today
-        col3.metric("Lowest today", f"${hist['Low'][-1]:.2f}") # Display lowest price today
+        col1.metric("Current Price", f"${hist['Close'].iloc[-1]:.2f}", delta_str) # Display current price with delta
+        col2.metric("Highest today", f"${hist['High'].iloc[-1]:.2f}") # Display highest price today
+        col3.metric("Lowest today", f"${hist['Low'].iloc[-1]:.2f}") # Display lowest price today
 
         st.markdown("---") # Horizontal separator
 
@@ -59,7 +59,7 @@ if ticker:
                           height=600,
                           template="plotly_dark") # Update chart layout
         
-        st.plotly_chart(fig, use_container_width=True) # Display the chart
+        st.plotly_chart(fig, width="stretch") # Display the chart
 
         with st.expander("Show Raw Data"): # Expander for raw data
             st.dataframe(hist.sort_index(ascending=False)) # Display raw historical data
