@@ -9,11 +9,15 @@ st.title("📈 Stock Analysis Tool") #Set page title
 
 with st.sidebar:
     st.header("Settings") # Sidebar header
+    if st.button("Refresh Cache"): # Button to reset cache
+        st.cache_data.clear() # Clear cached data
+        st.rerun() # Success message
     ticker = st.text_input("Enter Stock Ticker", value="AAPL").upper() # Input for stock ticker
     st.info("Enter a valid stock ticker symbol (e.g., AAPL, MSFT, GOOGL).") # Info message for ticker input
     period = st.selectbox("Select Data Period", options=['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'], index=2) # Select data period
     interval = st.selectbox("Select Data Interval", options=['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo'], index=8) # Select data interval
     chart_type = st.selectbox("Select Chart Type", options=['Candlestick', 'Line'], index=0) # Select chart type
+
 
 if ticker:
     hist, info = get_stock_data(ticker, period, interval) # Fetch stock data
