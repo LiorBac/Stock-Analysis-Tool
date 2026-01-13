@@ -2,6 +2,7 @@ import streamlit as st
 import plotly.graph_objects as go
 
 from stock_logic import get_stock_data
+from visualizations import create_stock_chart
 
 st.set_page_config(page_title="Stock Analysis Tool", layout="wide") # Set page configuration
 st.title("📈 Stock Analysis Tool") #Set page title
@@ -37,27 +38,7 @@ if ticker:
         st.markdown("---") # Horizontal separator
 
         st.subheader(f"Price Chart - {chart_type}") # Subheader for price chart
-        if chart_type == "Candlestick": # Candlestick chart
-            fig = go.Figure(data=[go.Candlestick(x=hist.index,
-                                                 open=hist['Open'],high=hist['High'],low=hist['Low'],close=hist['Close'],name='Price')]) # Create candlestick chart
-        else:
-            start_price = hist['Close'].iloc[0] # Get starting price
-            end_price = hist['Close'].iloc[-1] # Get ending price
-            if end_price > start_price: # Determine color based on price movement
-                line_color = 'green'
-                fill_color = 'rgba(0, 200, 5, 0.2)' # Green shade for increase
-            else:
-                line_color = 'red'
-                fill_color = 'rgba(255, 51, 51, 0.2)' # Red shade for decrease
-
-            fig = go.Figure(data=[go.Scatter(x=hist.index, y=hist['Close'], mode='lines',name='Close Price', line=dict(color=line_color,width=2), fill='tozeroy', fillcolor=fill_color)]) # Create line chart with dynamic coloring
-        
-        fig.update_layout(title=f"{company_name} ({ticker}) Price Chart",
-                          yaxis_title="Price (USD)",
-                          xaxis_title="Date",
-                          xaxis_rangeslider_visible=False,
-                          height=600,
-                          template="plotly_dark") # Update chart layout
+        fig = create_stock_chart(hist, company_name, ticker, chart_type) # Create stock chart
         
         st.plotly_chart(fig, width="stretch") # Display the chart
 
