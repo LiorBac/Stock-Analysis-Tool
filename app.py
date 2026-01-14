@@ -1,5 +1,6 @@
 import streamlit as st
-import plotly.graph_objects as go
+from datetime import timedelta,date
+
 
 from stock_logic import get_stock_data
 from visualizations import create_stock_chart
@@ -14,7 +15,20 @@ with st.sidebar:
         st.rerun() # Success message
     ticker = st.text_input("Enter Stock Ticker", value="AAPL").upper() # Input for stock ticker
     st.info("Enter a valid stock ticker symbol (e.g., AAPL, MSFT, GOOGL).") # Info message for ticker input
-    period = st.selectbox("Select Data Period", options=['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'], index=2) # Select data period
+    st.subheader("Time Period Settings")
+    time_mode = st.radio("Choose Mode:", ["Pre-defined Period", "Custom Dates"]) # Radio buttons for time mode selection 
+    
+    period = "1mo"
+    start_date = None
+    end_date = None
+
+    if time_mode == "Pre-defined Period":
+        period = st.selectbox("Select Data Period", options=['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'], index=2) # Select data period
+    else:
+        col_d1, col_d2 = st.columns(2)
+        start_date = col_d1.date_input("Start Date", value=date.today() - timedelta(days=30)) 
+        end_date = col_d2.date_input("End Date", value=date.today())
+
     interval = st.selectbox("Select Data Interval", options=['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo'], index=8) # Select data interval
     chart_type = st.selectbox("Select Chart Type", options=['Candlestick', 'Line'], index=0) # Select chart type
 
