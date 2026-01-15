@@ -14,7 +14,7 @@ def get_stock_data(ticker, period='1mo', interval='1d',start=None,end=None):
             if end == start:
                 end = None
             else:
-                hist = stock.history(period=period, interval=interval, auto_adjust=True, start=start, end=end) # Get historical data
+                hist= stock.history(start=start, end=end, interval=interval, auto_adjust=True) # Get historical data for custom dates
         
         try:
             info = stock.info # Get stock information
@@ -26,17 +26,6 @@ def get_stock_data(ticker, period='1mo', interval='1d',start=None,end=None):
         print(f"Error fetching data: {e}")
         return pd.DataFrame(), {}
     
-
-        
-    
-
-
-
-    try:
-        info = stock.info # Get stock information
-    except Exception:
-        info = {}
-    return hist, info
 
 def calculate_normalized_prices(hist):
     # Calculate normalized closing prices relative to the starting price

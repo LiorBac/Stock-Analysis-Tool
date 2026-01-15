@@ -16,25 +16,27 @@ with st.sidebar:
     ticker = st.text_input("Enter Stock Ticker", value="AAPL").upper() # Input for stock ticker
     st.info("Enter a valid stock ticker symbol (e.g., AAPL, MSFT, GOOGL).") # Info message for ticker input
     st.subheader("Time Period Settings")
-    time_mode = st.radio("Choose Mode:", ["Pre-defined Period", "Custom Dates"]) # Radio buttons for time mode selection 
+    time_mode = st.radio("Choose Mode:", ["Current Period", "Custom Dates"]) # Radio buttons for time mode selection 
     
-    period = "1mo"
+    period = None
     start_date = None
     end_date = None
 
-    if time_mode == "Pre-defined Period":
+    if time_mode == "Current Period":
         period = st.selectbox("Select Data Period", options=['1d', '5d', '1mo', '3mo', '6mo', '1y', '2y', '5y', '10y', 'ytd', 'max'], index=2) # Select data period
     else:
         col_d1, col_d2 = st.columns(2)
         start_date = col_d1.date_input("Start Date", value=date.today() - timedelta(days=30)) 
         end_date = col_d2.date_input("End Date", value=date.today())
+        if start_date >= end_date:
+            st.error("Error: End Date must be after Start Date.") # Error message for invalid date range
 
     interval = st.selectbox("Select Data Interval", options=['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo'], index=8) # Select data interval
     chart_type = st.selectbox("Select Chart Type", options=['Candlestick', 'Line'], index=0) # Select chart type
 
 
 if ticker:
-    hist, info = get_stock_data(ticker, period, interval) # Fetch stock data
+    hist, info = get_stock_data(ticker, period, interval, start_date, end_date) # Fetch stock data
 
     if hist.empty:
         st.error("No data found for the given ticker and parameters. Please check the ticker symbol and try again.") # Error message for no data
