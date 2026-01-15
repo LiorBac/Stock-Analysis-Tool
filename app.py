@@ -8,11 +8,18 @@ from visualizations import create_stock_chart
 st.set_page_config(page_title="Stock Analysis Tool", layout="wide") # Set page configuration
 st.title("📈 Stock Analysis Tool") #Set page title
 
+INDICES = {"S&P 500": "^GSPC", "Dow Jones": "^DJI", "NASDAQ": "^IXIC" ,"Russell 2000": "^RUT" , "None": None} # Predefined indices for benchmark comparison
+
+# ==============================
+#           SIDEBAR
+# ==============================
+
 with st.sidebar:
     st.header("Settings") # Sidebar header
     if st.button("Refresh Cache"): # Button to reset cache
         st.cache_data.clear() # Clear cached data
         st.rerun() # Success message
+
     ticker = st.text_input("Enter Stock Ticker", value="AAPL").upper() # Input for stock ticker
     st.info("Enter a valid stock ticker symbol (e.g., AAPL, MSFT, GOOGL).") # Info message for ticker input
     st.subheader("Time Period Settings")
@@ -34,9 +41,20 @@ with st.sidebar:
     interval = st.selectbox("Select Data Interval", options=['1m', '2m', '5m', '15m', '30m', '60m', '90m', '1h', '1d', '5d', '1wk', '1mo', '3mo'], index=8) # Select data interval
     chart_type = st.selectbox("Select Chart Type", options=['Candlestick', 'Line'], index=0) # Select chart type
 
+    st.subheader("Benchmark Comparison")
+    benchmark_option = st.selectbox("Select Benchmark Index", options=list(INDICES.keys()), index=4) # Select benchmark index
+    benchmark_ticker = INDICES[benchmark_option]
+
+# ==============================
+#        MAIN APP LOGIC
+# ==============================
 
 if ticker:
     hist, info = get_stock_data(ticker, period, interval, start_date, end_date) # Fetch stock data
+
+    bencmark_hist = None
+    if benchmark_ticker: # Fetch benchmark data if selected
+        bencmark_hist, _ = get_stock_data(benchmark_ticker, period, interval, start_date, end_date) # Fetch benchmark data
 
     if hist.empty:
         st.error("No data found for the given ticker and parameters. Please check the ticker symbol and try again.") # Error message for no data
@@ -57,8 +75,8 @@ if ticker:
 
         st.markdown("---") # Horizontal separator
 
-        st.subheader(f"Price Chart - {chart_type}") # Subheader for price chart
-        fig = create_stock_chart(hist, company_name, ticker, chart_type) # Create stock chart
+        st.subheader(f"Price Chart - {chart_type if benchmark_ticker is None else 'Comparison'}") # Subheader for price chart
+        fig = create_stock_chart(hist, company_name, ticker, chart_type, bencmark_hist,benchmark_ticker) # Create stock chart
         
         st.plotly_chart(fig, width="stretch") # Display the chart
 

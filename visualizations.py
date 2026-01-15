@@ -1,7 +1,10 @@
 import plotly.graph_objects as go
+from stock_logic import calculate_normalized_prices
 
-def create_stock_chart(hist, company_name, ticker, chart_type):
+def create_stock_chart(hist, company_name, ticker, chart_type,benchmark_hist=None,benchmark_ticker=None):
     """Create a Plotly chart for stock data based on the specified chart type."""
+    if benchmark_hist is not None:
+        return create_benchmark_comparison_chart(hist, benchmark_hist, company_name, ticker, benchmark_ticker, chart_type) # Benchmark comparison chart
     if chart_type == "Candlestick":
         fig = create_stock_candlestick_chart(hist) # Candlestick chart
     else:
@@ -53,4 +56,43 @@ def _apply_chart_layout(fig, hist, company_name, ticker):
                       height=600,
                       template="plotly_dark",
                     yaxis=dict(range=[ylim_low, ylim_high]))
+    return fig
+
+def create_benchmark_comparison_chart(hist, benchmark_hist, company_name, ticker, benchmark_name, chart_type):
+    """Create a Plotly chart comparing stock data with a benchmark index."""
+    # Normalize both datasets to start at 100
+    normalized_hist = calculate_normalized_prices(hist)
+    normalized_benchmark_hist = calculate_normalized_prices(benchmark_hist)
+
+    # Create the chart
+    fig = go.Figure()
+
+    # Add stock data
+    fig.add_trace(go.Scatter(
+        x=normalized_hist.index, 
+        y=normalized_hist, 
+        mode='lines', 
+        name=f'{company_name} ({ticker})',
+        line=dict(color='#00C805', width=2)
+    ))
+
+    # Add benchmark data
+    fig.add_trace(go.Scatter(
+        x=normalized_benchmark_hist.index, 
+        y=normalized_benchmark_hist, 
+        mode='lines', 
+        name=f'{benchmark_name}',
+        line=dict(color='gray', width=2, dash='dash')
+    ))
+
+    # Update layout
+    fig.update_layout(
+        title=f"Performance Comparison: {ticker} vs {benchmark_name}",
+        yaxis_title="Return (%)",
+        xaxis_title="Date",
+        xaxis_rangeslider_visible=False,
+        height=600,
+        template="plotly_dark",
+        yaxis=dict(tickformat=".1%")
+    )
     return fig
