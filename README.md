@@ -2,6 +2,8 @@
 
 A web-based application built with **Python** and **Streamlit** for real-time stock market analysis. The tool allows users to visualize stock data and compare performance against major market benchmarks.
 
+![App Preview](./Img/StockAnalysisToolDemo.png)
+
 ## 🚀 Features
 
 * **Real-time Data:** Fetches up-to-date stock data using Yahoo Finance API.
